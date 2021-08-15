@@ -17,8 +17,6 @@ const chatWindowContainer = ({ children, ...restProps }) => {
 
   const [snapshots, loading, error] = useList(activeGroupRef);
 
-  if (loading) return <h1>jjj</h1>;
-
   activeChatRoom &&
     db
       .ref(`chats/${activeChatRoom}`)

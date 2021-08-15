@@ -20,7 +20,7 @@ const GlobalStyles = createGlobalStyle`
 		font-size: 1rem;
 		font-weight: 400;
 		line-height: 1.6;
-		background-color: #ffffff;
+		background-color: #D4DADA;
 		-webkit-text-size-adjust: 100%;
 		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 		-webkit-font-smoothing: antialiased;
