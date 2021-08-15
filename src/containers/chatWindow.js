@@ -6,7 +6,8 @@ import firebase from "firebase";
 import { useList } from "react-firebase-hooks/database";
 
 const chatWindowContainer = ({ children, ...restProps }) => {
-  const { activeChatRoom, email } = useContext(UserContext);
+  const { activeChatRoom, email, activeChat, setActiveChat } =
+    useContext(UserContext);
 
   const [chatMessage, setChatMessage] = useState("");
 
@@ -16,28 +17,36 @@ const chatWindowContainer = ({ children, ...restProps }) => {
 
   const [snapshots, loading, error] = useList(activeGroupRef);
 
-  db.ref(`chats/${activeChatRoom}`)
-    .orderByChild("status")
-    .equalTo("received")
-    .on("child_added", (snapshot) => {
-      const { sent_by } = snapshot.val();
+  if (loading) return <h1>jjj</h1>;
 
-      if (sent_by !== email) {
-        db.ref(`chats/${activeChatRoom}/${snapshot.key}`).update({
-          status: "seen",
-        });
-      }
-    });
+  activeChatRoom &&
+    db
+      .ref(`chats/${activeChatRoom}`)
+      .orderByChild("status")
+      .equalTo("received")
+      .on("child_added", (snapshot) => {
+        const { sent_by } = snapshot.val();
+
+        if (sent_by !== email) {
+          db.ref(`chats/${activeChatRoom}/${snapshot.key}`).update({
+            status: "seen",
+          });
+        }
+      });
 
   const sendMessage = () => {
-    const newPostKey = db.ref(`chats/${activeChatRoom}`).push().key;
+    if (activeChatRoom) {
+      const newPostKey = db.ref(`chats/${activeChatRoom}`).push().key;
 
-    db.ref(`chats/${activeChatRoom}/${newPostKey}`).set({
-      message: chatMessage,
-      status: "sent",
-      sent_by: email,
-      timestamp: firebase.database.ServerValue.TIMESTAMP,
-    });
+      db.ref(`chats/${activeChatRoom}/${newPostKey}`).set({
+        message: chatMessage,
+        status: "sent",
+        sent_by: email,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+      });
+    } else {
+      alert("No Chat Room Exists");
+    }
 
     setChatMessage((prev) => "");
   };
@@ -50,8 +59,8 @@ const chatWindowContainer = ({ children, ...restProps }) => {
       ) : (
         <>
           <ChatWindow.Header>
-            <ChatWindow.HeaderImage src="https://source.unsplash.com/random/70x70?sig=2" />
-            <ChatWindow.Title>Satya</ChatWindow.Title>
+            <ChatWindow.HeaderImage src={activeChat?.friendsPhotoUrl} />
+            <ChatWindow.Title>{activeChat?.friendsEmail}</ChatWindow.Title>
             <ChatWindow.HeaderImage src="images/search.svg" />
             <ChatWindow.HeaderImage src="images/option.svg" />
           </ChatWindow.Header>

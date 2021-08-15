@@ -10,6 +10,7 @@ const App = () => {
   const [user, loading] = useAuthState(auth);
 
   const [activeChatRoom, setActiveChatRoom] = useState(null);
+  const [activeChat, setActiveChat] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -17,6 +18,7 @@ const App = () => {
         email: user.email,
         lastSeen: firebase.database.ServerValue.TIMESTAMP,
         photoUrl: user.photoURL,
+        online: true,
       });
     }
     return () => {};
@@ -26,11 +28,37 @@ const App = () => {
 
   if (loading) return <h1>Loading.... Please Wait</h1>;
 
+  db.ref(".info/connected").on("value", function (snapshot) {
+    if (snapshot.val() == false) {
+      return;
+    }
+
+    db.ref(`users/${user.email.split(".").join(",")}`)
+      .onDisconnect()
+      .update({
+        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+        online: false,
+      })
+      .then(function () {
+        db.ref(`users/${user.email.split(".").join(",")}`).update({
+          lastSeen: firebase.database.ServerValue.TIMESTAMP,
+          online: true,
+        });
+      });
+  });
+
   const { email, photoURL } = user;
 
   return (
     <UserContext.Provider
-      value={{ email, photoURL, activeChatRoom, setActiveChatRoom }}
+      value={{
+        email,
+        photoURL,
+        activeChatRoom,
+        setActiveChatRoom,
+        activeChat,
+        setActiveChat,
+      }}
     >
       <Chat />
     </UserContext.Provider>
