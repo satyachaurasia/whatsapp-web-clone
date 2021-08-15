@@ -47,7 +47,7 @@ export const ChatBox = styled.div`
   background-repeat: repeat; */
   background-color: #dddbd1;
 
-  padding: 1rem 7rem 1rem 7rem;
+  padding: 1rem 5% 1rem 5%;
   display: flex;
   flex-direction: column;
 
@@ -82,7 +82,7 @@ export const InputIcon = styled.img`
 const Chat = styled.div`
   position: relative;
   max-width: 20rem;
-  width: 50px;
+  min-width: 50px;
   border-radius: 10px;
   font-size: 0.9rem;
 `;
